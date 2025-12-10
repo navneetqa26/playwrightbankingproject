@@ -1,0 +1,38 @@
+{
+  "transferTransaction": {
+    "type": "Transfer",
+    "amount": "500",
+    "toAccount": "9876543210",
+    "description": "Monthly transfer to savings account",
+    "fromAccount": "1234567890",
+    "currency": "USD",
+    "transactionDate": "2025-12-09",
+    "priority": "Normal",
+    "referenceNumber": "REF123456",
+    "status": "Completed"
+  },
+  "largeTransfer": {
+    "type": "Transfer",
+    "amount": "5000",
+    "toAccount": "9876543210",
+    "description": "Large transfer for investment",
+    "fromAccount": "1234567890",
+    "currency": "USD",
+    "transactionDate": "2025-12-09",
+    "priority": "High",
+    "referenceNumber": "",
+    "status": "Pending"
+  },
+  "smallTransfer": {
+    "type": "Transfer",
+    "amount": "50",
+    "toAccount": "1111111111",
+    "description": "Quick payment",
+    "fromAccount": "1234567890",
+    "currency": "USD",
+    "transactionDate": "2025-12-09",
+    "priority": "Normal",
+    "referenceNumber": "",
+    "status": "Pending"
+  }
+}

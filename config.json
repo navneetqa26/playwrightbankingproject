@@ -1,0 +1,19 @@
+{
+  "url": "https://bakkappan.github.io/Testers-Talk-Practice-Site/",
+  "username": "TestersTalk",
+  "password": "TestersTalk",
+  "appName": "Banking",
+  "bankingUrl": "Banking-Project-Demo.html",
+  "timeout": {
+    "page": 15000,
+    "navigation": 20000,
+    "element": 5000,
+    "action": 10000
+  },
+  "transaction": {
+    "amount": "500",
+    "toAccount": "9876543210",
+    "description": "Transfer to Test Account",
+    "type": "Transfer"
+  }
+}
