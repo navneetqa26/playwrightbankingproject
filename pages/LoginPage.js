@@ -73,7 +73,15 @@ export class LoginPage extends BasePage {
     await this.enterUsername(username);
     await this.enterPassword(password);
     await this.selectApplication(appName);
-    await this.clickLogin();
+    // Click login and wait for either the banking URL or the home header to appear
+    await Promise.all([
+      this.page.waitForURL(/Banking-Project-Demo.html/, { timeout: 60000 }).catch(() => {}),
+      (async () => {
+        await this.clickLogin();
+      })()
+    ]);
+    // As a fallback, wait for a known home heading to be visible
+    await this.page.getByRole('heading', { name: /Sample Banking Application|🏦 Sample Banking Application/i }).first().waitFor({ state: 'visible', timeout: 30000 }).catch(() => {});
   }
 
   /**

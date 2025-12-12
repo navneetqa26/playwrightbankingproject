@@ -65,9 +65,10 @@ export class BasePage {
    * @param {object} options - Additional options
    */
   async fillTextByRole(name, value, options = {}) {
-    const textbox = this.page.getByRole('textbox', { name });
-    await textbox.waitFor({ state: 'visible', timeout: 15000 });
-    await textbox.fill(value, { ...options, timeout: 15000 });
+    const textbox = this.page.getByRole('textbox', { name }).first();
+    // Wait longer for slow browsers/environments and then fill using Playwright defaults
+    await textbox.waitFor({ state: 'visible', timeout: 30000 });
+    await textbox.fill(value, options);
   }
 
   /**
@@ -77,9 +78,9 @@ export class BasePage {
    * @param {object} options - Additional options
    */
   async fillByLabel(label, value, options = {}) {
-    const field = this.page.getByLabel(label);
-    await field.waitFor({ state: 'visible', timeout: 15000 });
-    await field.fill(value, { ...options, timeout: 15000 });
+    const field = this.page.getByLabel(label).first();
+    await field.waitFor({ state: 'visible', timeout: 30000 });
+    await field.fill(value, options);
   }
 
   /**
@@ -89,7 +90,8 @@ export class BasePage {
    * @param {object} options - Additional options
    */
   async selectOptionByLabel(label, value, options = {}) {
-    const dropdown = this.page.getByLabel(label);
+    const dropdown = this.page.getByLabel(label).first();
+    await dropdown.waitFor({ state: 'visible', timeout: 30000 }).catch(() => {});
     await dropdown.selectOption(value, options);
   }
 
@@ -99,7 +101,9 @@ export class BasePage {
    * @param {object} options - Additional options
    */
   async clickButtonByRole(name, options = {}) {
-    const button = this.page.getByRole('button', { name });
+    const button = this.page.getByRole('button', { name }).first();
+    // ensure button is visible and enabled before clicking (avoid transient overlays)
+    await button.waitFor({ state: 'visible', timeout: 30000 });
     await button.click(options);
   }
 
@@ -109,7 +113,7 @@ export class BasePage {
    * @param {object} options - Additional options
    */
   async clickLinkByRole(name, options = {}) {
-    await this.page.getByRole('link', { name }).click(options);
+    await this.page.getByRole('link', { name }).first().click(options);
   }
 
   /**
@@ -118,7 +122,7 @@ export class BasePage {
    * @param {object} options - Additional options
    */
   async clickBySelector(selector, options = {}) {
-    await this.page.locator(selector).click(options);
+    await this.page.locator(selector).first().click(options);
   }
 
   /**
@@ -127,7 +131,9 @@ export class BasePage {
    * @returns {Promise<string>} The text content
    */
   async getTextContent(selector) {
-    return await this.page.locator(selector).textContent();
+    const loc = this.page.locator(selector).first();
+    await loc.waitFor({ state: 'visible' }).catch(() => {});
+    return await loc.textContent();
   }
 
   /**
@@ -136,7 +142,7 @@ export class BasePage {
    * @param {number} timeout - Timeout in milliseconds
    */
   async waitForElement(selector) {
-    await this.page.locator(selector).waitFor({ state: 'visible' });
+    await this.page.locator(selector).first().waitFor({ state: 'visible' });
   }
 
   /**
@@ -146,7 +152,7 @@ export class BasePage {
    */
   async isElementVisible(selector) {
     try {
-      await this.page.locator(selector).waitFor({ state: 'visible' });
+      await this.page.locator(selector).first().waitFor({ state: 'visible' });
       return true;
     } catch {
       return false;

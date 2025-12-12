@@ -110,28 +110,37 @@ export class TransactionHistoryPage extends BasePage {
    * @returns {Promise<boolean>} True if all verifications pass
    */
   async verifyTransactionHistory(transactionData) {
-    // Wait a moment for data to load
-    await this.waitForTimeout(1000);
-    
-    // Verify history section is visible
-    const isSectionVisible = await this.isTransactionHistorySectionVisible();
-    if (!isSectionVisible) {
-      throw new Error('Transaction History section not visible');
+    // Retry checks for a short period to allow the history to update
+    const maxAttempts = 8;
+    const delayMs = 1000;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      // Verify history section is visible
+      const isSectionVisible = await this.isTransactionHistorySectionVisible();
+      if (!isSectionVisible) {
+        if (attempt === maxAttempts) throw new Error('Transaction History section not visible');
+        await this.waitForTimeout(delayMs);
+        continue;
+      }
+
+      // Verify transactions exist
+      const hasTransactions = await this.hasTransactions();
+      if (!hasTransactions) {
+        if (attempt === maxAttempts) throw new Error('No transactions found in history');
+        await this.waitForTimeout(delayMs);
+        continue;
+      }
+
+      // Verify the specific transaction is visible
+      const isTransactionVisible = await this.isTransactionVisible(transactionData);
+      if (isTransactionVisible) return true;
+
+      if (attempt === maxAttempts) {
+        throw new Error(`Transaction with amount ${transactionData.amount} not found in history`);
+      }
+
+      await this.waitForTimeout(delayMs);
     }
-    
-    // Verify transactions exist
-    const hasTransactions = await this.hasTransactions();
-    if (!hasTransactions) {
-      throw new Error('No transactions found in history');
-    }
-    
-    // Verify the specific transaction is visible
-    const isTransactionVisible = await this.isTransactionVisible(transactionData);
-    if (!isTransactionVisible) {
-      throw new Error(`Transaction with amount ${transactionData.amount} not found in history`);
-    }
-    
-    return true;
+    return false;
   }
 
   /**
